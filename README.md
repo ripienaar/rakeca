@@ -49,42 +49,42 @@ Signing a Certificate Signing Request
 Now once you have a CA you probably want to sign some certs, if you already
 have a CSR then just copy it into your CA directory:
 
-   $ cp /tmp/mycert.csr .
-   $ rake sign
-   >>> Signing mycert.csr creating mycert.cert
-   openssl ca -batch -config openssl.cnf -in mycert.csr -out mycert.cert
-   Using configuration from openssl.cnf
-   Enter pass phrase for ./private/ca-key.pem:
-   Check that the request matches the signature
-   Signature ok
-   Certificate Details:
-           Serial Number: 1 (0x1)
-           Validity
-               Not Before: May 24 15:32:45 2012 GMT
-               Not After : May 24 15:32:45 2014 GMT
-           Subject:
-               countryName               = GB
-               stateOrProvinceName       = London
-               organizationName          = MyCo
-               organizationalUnitName    = Webops
-               commonName                = web1.myco.com
-               emailAddress              = sysadmin@myco.com
-           X509v3 extensions:
-               X509v3 Basic Constraints:
-                   CA:FALSE
-               X509v3 Subject Key Identifier:
-                   9B:34:38:57:B3:70:56:B5:D8:80:F8:5D:4F:24:9F:4B:9C:E3:4B:FD
-               X509v3 Authority Key Identifier:
-                   keyid:56:88:2C:9A:B3:3C:E8:71:A6:AD:B3:34:C8:9C:3B:C5:F9:81:22:BF
-                   DirName:/CN=MyCA/C=GB/ST=London/L=London/emailAddress=me@my.com
-                   serial:F9:18:15:E5:E1:8A:22:3C
+    $ cp /tmp/mycert.csr .
+    $ rake sign
+    >>> Signing mycert.csr creating mycert.cert
+    openssl ca -batch -config openssl.cnf -in mycert.csr -out mycert.cert
+    Using configuration from openssl.cnf
+    Enter pass phrase for ./private/ca-key.pem:
+    Check that the request matches the signature
+    Signature ok
+    Certificate Details:
+            Serial Number: 1 (0x1)
+            Validity
+                Not Before: May 24 15:32:45 2012 GMT
+                Not After : May 24 15:32:45 2014 GMT
+            Subject:
+                countryName               = GB
+                stateOrProvinceName       = London
+                organizationName          = MyCo
+                organizationalUnitName    = Webops
+                commonName                = web1.myco.com
+                emailAddress              = sysadmin@myco.com
+            X509v3 extensions:
+                X509v3 Basic Constraints:
+                    CA:FALSE
+                X509v3 Subject Key Identifier:
+                    9B:34:38:57:B3:70:56:B5:D8:80:F8:5D:4F:24:9F:4B:9C:E3:4B:FD
+                X509v3 Authority Key Identifier:
+                    keyid:56:88:2C:9A:B3:3C:E8:71:A6:AD:B3:34:C8:9C:3B:C5:F9:81:22:BF
+                    DirName:/CN=MyCA/C=GB/ST=London/L=London/emailAddress=me@my.com
+                    serial:F9:18:15:E5:E1:8A:22:3C
 
-               Netscape CA Revocation Url:
-                   https://ca.my.com/ca-crl.pem
-   Certificate is to be certified until May 24 15:32:45 2014 GMT (730 days)
+                Netscape CA Revocation Url:
+                    https://ca.my.com/ca-crl.pem
+    Certificate is to be certified until May 24 15:32:45 2014 GMT (730 days)
 
-   Write out database with 1 new entries
-   Data Base Updated
+    Write out database with 1 new entries
+    Data Base Updated
 
 A copy of the certificate will be stored in _newcerts_
 
