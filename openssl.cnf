@@ -11,10 +11,10 @@ new_certs_dir   = $dir/newcerts
 crl_dir         = $dir/crl
 database        = $dir/index
 
-certificate     = $dir/ca-cert.pem
+certificate     = $dir/ca_crt.pem
 serial          = $dir/serial
-crl             = $dir/ca-crl.pem
-private_key     = $dir/private/ca-key.pem
+crl             = $dir/ca_crl.pem
+private_key     = $dir/private/ca_key.pem
 RANDFILE        = $dir/private/.rand
 
 x509_extensions = usr_cert
@@ -63,11 +63,11 @@ emailAddress            = optional
 ####################################################################
 [ req ]
 default_bits            = 2048
-default_keyfile         = ./private/ca-key.pem
+default_keyfile         = ./private/ca_key.pem
 default_md              = sha1
 
-prompt                  = no
-distinguished_name      = root_ca_distinguished_name
+# prompt                  = no
+distinguished_name      = req_distinguished_name
 
 x509_extensions = v3_ca
 
@@ -87,12 +87,31 @@ string_mask = nombstr
 
 # req_extensions = v3_req
 
-[ root_ca_distinguished_name ]
-commonName = <%= common_name %>
-countryName = <%= country_name %>
-stateOrProvinceName = <%= state %>
-localityName = <%= locality %>
-emailAddress = <%= email %>
+[ req_distinguished_name ]
+countryName         = Country Name (2 letter code)
+countryName_default = US
+countryName_min     = 2
+countryName_max     = 2
+
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = Oregon
+
+localityName         = Locality Name (eg, city)
+localityName_default = Portland
+
+0.organizationName    = Organization Name (eg, company)
+0.organizationName_default  = Puppet Labs
+
+commonName = Common Name (eg, YOUR name)
+commonName_default = ${ENV::CN}
+commonName_max = 64
+
+organizationalUnitName         = Organizational Unit Name (eg, section)
+organizationalUnitName_default = Engineering
+
+emailAddress         = Email Address
+emailAddress_default = security@puppetlabs.com
+emailAddress_max     = 40
 
 [ usr_cert ]
 
@@ -107,7 +126,7 @@ basicConstraints=CA:FALSE
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
 
-nsCaRevocationUrl               = <%= crlurl %>
+nsCaRevocationUrl               = http://puppetlabs.com/ca.crl
 #nsBaseUrl
 #nsRevocationUrl
 #nsRenewalUrl

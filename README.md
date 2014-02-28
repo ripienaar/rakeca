@@ -2,46 +2,24 @@ What?
 =====
 
 There used to be a Makefile based CA script at sial.org but this has died when
-the domain expired and the author is not responsive.
+the domain expired and has since moved to http://www.novosial.org/.
 
 This is a port of that CA to a Rakefile with a few enhancements, there are
-better CA management tools out there but this one is mine and I like it.
+better CA management tools out there but this one is pretty straight-forward
+and works well enough to exercise the behavior of a CA.
 
 Usage?
 ======
 
 Clone this repo into your new CA directory and optionally tweak the
-_openssl.cnf.erb_ file to your liking, leave the erb bits in there since the
-Rakefile will ask you a few questions on initial run.
-
-Alternatively just create a _openssl.cnf_ in the directory and that will be
-used without you being asked any questions.
+`_openssl.cnf` file to your liking.
 
 Create a CA
 -----------
 
-This will create a new CA, the password it asks will be required to sign new
-certificates in the future so DO NOT LOSE IT.
+This will create a new CA.
 
     $ rake init
-    CA Common Name (CA): MyCA
-    CA Country Name: GB
-    CA State or Province: London
-    Locality: London
-    Email Address: me@my.com
-    URL to the CRL: https://ca.my.com/ca-crl.pem
-    >>> Creating directory crl
-    >>> Creating directory newcerts
-    >>> Creating directory private
-    openssl req -config openssl.cnf -days 1825 -x509 -newkey rsa:2048 -out
-    ca-cert.pem -outform PEM
-    Generating a 2048 bit RSA private key
-    .........................................................................+++
-    .........+++
-    writing new private key to './private/ca-key.pem'
-    Enter PEM pass phrase:
-    Verifying - Enter PEM pass phrase:
-    -----
 
 Signing a Certificate Signing Request
 -------------------------------------
@@ -86,44 +64,17 @@ have a CSR then just copy it into your CA directory:
     Write out database with 1 new entries
     Data Base Updated
 
-A copy of the certificate will be stored in _newcerts_
+A copy of the certificate will be stored in `newcerts`.
 
 Creating a CSR and Key
 ----------------------
 
 If you dont have a CSR or key already you can create one:
 
-    % rake gencsr CERT=mycert
-    openssl req -out mycert.csr -new -newkey rsa:2048 -keyout mycert.key
-    Generating a 2048 bit RSA private key
-    ...........................................................+++
-    ..................+++
-    writing new private key to 'mycert.key'
-    Enter PEM pass phrase:
-    Verifying - Enter PEM pass phrase:
-    -----
-    You are about to be asked to enter information that will be incorporated
-    into your certificate request.
-    What you are about to enter is what is called a Distinguished Name or a DN.
-    There are quite a few fields but you can leave some blank
-    For some fields there will be a default value,
-    If you enter '.', the field will be left blank.
-    -----
-    Country Name (2 letter code) [XX]:GB
-    State or Province Name (full name) []:London
-    Locality Name (eg, city) [Default City]:London
-    Organization Name (eg, company) [Default Company Ltd]:MyCo
-    Organizational Unit Name (eg, section) []:
-    Common Name (eg, your name or your server's hostname) []:web1.my.com
-    Email Address []:sysadmin@my.com
+    % rake gencsr CN=mycert
 
-    Please enter the following 'extra' attributes
-    to be sent with your certificate request
-    A challenge password []:
-    An optional company name []:
-
-This will leave _mycert.key_ and _mycert.csr_ in the current directory
-protected with the password you provided, you can now use _rake sign_ to sign
+This will leave `mycert.key` and `mycert.csr` in the current directory
+protected with the password you provided, you can now use `rake sign` to sign
 this certificate
 
 Revoking a certificate
@@ -131,7 +82,7 @@ Revoking a certificate
 When retiring systems you need to revoke their old certificates, to revoke a
 certificate you need a copy of the certificate.
 
-    % rake revoke CERT=newcerts/01.pem
+    % rake revoke CN=newcerts/01.pem
     >>> Revoking certificate newcerts/01.pem
     openssl ca -config openssl.cnf -revoke 'newcerts/01.pem'
     Using configuration from openssl.cnf
@@ -157,7 +108,7 @@ If you do not need the CA anymore you can destroy it:
     Type 'yes' to destroy the CA: yes
     %
 
-Contact?
+Original Author
 ========
 
 R.I.Pienaar / rip@devco.net / @ripienaar / http://devco.net/

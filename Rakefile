@@ -18,23 +18,16 @@ def ask(prompt, env, default="")
     resp.empty? ? default : resp
 end
 
-def render_template(template, output, scope)
-    tmpl = File.read(template)
-    erb = ERB.new(tmpl, 0, "<>")
-    File.open(output, "w") do |f|
-        f.puts erb.result(scope)
-    end
-end
-
 def has_ca?
   File.exist?("serial") && File.exist?("openssl.cnf") && File.exist?("private")
 end
 
 desc "Create a new CSR and private key"
 task :gencsr do
-  abort "Please specify a cert name to generate using CERT=mycert" unless ENV["CERT"]
+  abort "Please specify a cert name to generate using CN=mycert" unless ENV["CN"]
 
-  sh "openssl req -out %s.csr -new -newkey rsa:2048 -keyout %s.key" % [ ENV["CERT"], ENV["CERT"] ]
+  sh "openssl genrsa -out #{ENV['CN']}.key 2048"
+  sh "openssl req -out #{ENV['CN']}.csr -new -key #{ENV['CN']}.key -config openssl.cnf"
 end
 
 desc "Remove all *.csr files in the current directory"
@@ -48,12 +41,12 @@ end
 desc "Revoke a certificate"
 task :revoke do
   abort "Please create a CA using 'rake init'" unless has_ca?
-  abort "Please specify a cert to revoke using CERT" unless ENV["CERT"]
-  abort "Cannot find the certificate '%s' to revoke" % ENV["CERT"] unless File.exist?(ENV["CERT"])
+  abort "Please specify a cert to revoke using CN" unless ENV["CN"]
+  abort "Cannot find the certificate '%s' to revoke" % ENV["CN"] unless File.exist?(ENV["CN"])
 
-  log "Revoking certificate %s" % ENV["CERT"]
+  log "Revoking certificate %s" % ENV["CN"]
 
-  sh "openssl ca -config openssl.cnf -revoke '%s'" % ENV["CERT"]
+  sh "openssl ca -config openssl.cnf -revoke '%s'" % ENV["CN"]
   Rake::Task["gencrl"].invoke
 end
 
@@ -61,6 +54,7 @@ desc "Sign *.csr files"
 task :sign do
   abort "Please create a CA using 'rake init'" unless has_ca?
 
+  ENV['CN'] = '.'
   Dir.glob("*.csr").each do |csr|
     certname = "%s.%s" % [ File.basename(csr, ".csr"), "cert" ]
     log "Signing %s creating %s" % [csr, certname]
@@ -72,30 +66,19 @@ end
 desc "Recreate the certificate revocation list"
 task :gencrl do
   abort "Please create a CA using 'rake init'" unless has_ca?
-  sh "openssl ca -config openssl.cnf -gencrl -out ca-crl.pem"
+  sh "openssl ca -config openssl.cnf -gencrl -out ca_crl.pem"
 end
 
 desc "Completely irreversibly destroy the CA"
 task :destroy_ca do
   confirm = ask("Type 'yes' to destroy the CA", "", nil)
 
-  FileUtils.rm_rf %w{serial openssl.cnf newcerts index crl private ca-cert.pem ca-crl.pem index.attr index.old serial.old index.attr.old} if confirm == "yes"
+  FileUtils.rm_rf %w{serial openssl.cnf newcerts index crl private ca_crt.pem ca_crl.pem index.attr index.old serial.old index.attr.old} if confirm == "yes"
 end
 
 desc "Create a new CA from scratch"
 task :init do
   abort "CA has already been created in the current directory" if has_ca?
-
-  unless File.exist?("openssl.cnf")
-    common_name = ask("CA Common Name", "COMMONNAME", "CA")
-    country_name = ask("CA Country Name", "COUNTRYNAME", nil)
-    state = ask("CA State or Province", "STATE", nil)
-    locality = ask("Locality", "LOCALITY", nil)
-    email = ask("Email Address", "EMAIL", nil)
-    crlurl = ask("URL to the CRL", "", nil)
-
-    render_template("openssl.cnf.erb", "openssl.cnf", binding)
-  end
 
   %w{crl newcerts private}.each do |dir|
     log "Creating directory %s" % dir
@@ -107,5 +90,6 @@ task :init do
 
   File.open("serial", "w") {|f| f.puts "01"}
 
-  sh "openssl req -config openssl.cnf -days 1825 -x509 -newkey rsa:2048 -out ca-cert.pem -outform PEM"
+  ENV['CN'] = "Puppet Labs Root Certificate Authority #{Time.now.strftime("%s")}"
+  sh "openssl req -nodes -config openssl.cnf -days 1825 -x509 -newkey rsa:2048 -out ca_crt.pem -outform PEM"
 end
