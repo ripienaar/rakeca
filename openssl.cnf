@@ -103,11 +103,7 @@ localityName_default = Portland
 0.organizationName_default  = Puppet Labs
 
 commonName = Common Name (eg, YOUR name)
-<% if config_type == 'root' then %>
-commonName_default = Puppet Labs <%= config_type.capitalize %> Certificate Authority <%= timestamp %>
-<% else %>
-commonName_default = ${ENV::CERT}
-<% end %>
+commonName_default = ${ENV::CN}
 commonName_max = 64
 
 organizationalUnitName         = Organizational Unit Name (eg, section)
