@@ -18,6 +18,7 @@ private_key     = $dir/private/ca-key.pem
 RANDFILE        = $dir/private/.rand
 
 x509_extensions = usr_cert
+copy_extensions = copy
 
 # Make new requests easier to sign - allow two subjects with same name
 # (Or revoke the old certificate first.)
