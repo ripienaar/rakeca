@@ -34,7 +34,13 @@ desc "Create a new CSR and private key"
 task :gencsr do
   abort "Please specify a cert name to generate using CERT=mycert" unless ENV["CERT"]
 
-  sh "openssl req -out %s.csr -new -newkey rsa:2048 -keyout %s.key" % [ ENV["CERT"], ENV["CERT"] ]
+  cmd = "openssl req -out %s.csr -new -newkey rsa:2048 -keyout %s.key" % [ ENV["CERT"], ENV["CERT"] ]
+
+  if ENV["CONFIG"]
+    cmd = "%s -config %s" % [cmd, ENV["CONFIG"]]
+  end
+
+  sh cmd
 end
 
 desc "Remove all *.csr files in the current directory"

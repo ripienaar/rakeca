@@ -126,6 +126,15 @@ This will leave _mycert.key_ and _mycert.csr_ in the current directory
 protected with the password you provided, you can now use _rake sign_ to sign
 this certificate
 
+Signing will use your system wide _openssl.cnf_ but you can specify a custom
+location in order to add subjectAltNames or other extensions:
+
+    % rake gencsr CERT=mycert CONFIG=my.cnf
+
+You can see the file ```request_config.sample``` for a sample request config
+file that adds alt names and configures the prompts - you can set defaults here
+too
+
 Revoking a certificate
 ----------------------
 When retiring systems you need to revoke their old certificates, to revoke a
