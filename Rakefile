@@ -43,6 +43,17 @@ task :gencsr do
   sh cmd
 end
 
+desc "Strip passphrase from private key"
+task :strip do
+  abort "Please specify a key name to remove the passphrase from using CERT=mycert" unless ENV["CERT"]
+  key = "%s.key" % ENV["CERT"]
+  abort "Specified key file missing: %s" % key unless File.exists?(key)
+
+  cmd = "openssl rsa -in %s -out %s_u.key" % [key, ENV["CERT"]]
+
+  sh cmd
+end
+
 desc "Remove all *.csr files in the current directory"
 task :clean do
   Dir.glob("*.csr").each do |csr|
